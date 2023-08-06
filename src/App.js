@@ -7,7 +7,7 @@ import pin from "./images/pin.png";
 import search from "./images/search.png";
 import './App.css';
 import axios from 'axios';
-
+import FormatDate from "./Date"
 
 export default function App() {
     const [value, setValue] = useState(null);
@@ -24,8 +24,7 @@ export default function App() {
         });
 
     }
-
-    //axios.get(apiUrl).then(handleResponse);
+    
     function handleSubmit(e) {
         e.preventDefault();
         if (value) {
@@ -71,7 +70,7 @@ export default function App() {
                                 </div>
                                 <div className="col-10 location">
                                     <span className="city">{city}</span>
-                                    <p className="today-date">Saturday, July 8, 17:41</p>
+                                    <p className="today-date"><FormatDate/></p>
                                 </div>
                             </div>
                         </div>
