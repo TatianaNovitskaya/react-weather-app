@@ -24,7 +24,7 @@ export default function App() {
         });
 
     }
-    
+
     function handleSubmit(e) {
         e.preventDefault();
         if (value) {
@@ -70,7 +70,7 @@ export default function App() {
                                 </div>
                                 <div className="col-10 location">
                                     <span className="city">{city}</span>
-                                    <p className="today-date"><FormatDate/></p>
+                                    <FormatDate/>
                                 </div>
                             </div>
                         </div>

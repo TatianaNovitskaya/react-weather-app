@@ -14,6 +14,8 @@ export default  function FormatDate() {
     }
     let currentTime = `${now.getHours()}:${hours}`;
     currentDate = `${currentWeekDay},  ${currentMonth} ${currentDay}, ${currentTime}`;
-    return currentDate
+    return (
+        <div className="today-date">{currentDate}</div>
+    );
 
 }
