@@ -1,3 +1,4 @@
+import React, {useState, useEffect} from 'react';
 import clouds from "./images/clouds.png";
 import heat from "./images/heat.png";
 import drop from "./images/drop.png";
@@ -5,15 +6,49 @@ import wind from "./images/wind.png";
 import pin from "./images/pin.png";
 import search from "./images/search.png";
 import './App.css';
+import axios from 'axios';
 
 
 export default function App() {
+    const [value, setValue] = useState(null);
+    const [city, setCity] = useState("Paris");
+    const [weatherData, setWeatherData] = useState({})
+    const apiKey = "a9573fb89158f89d83ceea2936963385";
+    function getCityInfo(response) {
+        setWeatherData({
+            temperature: response.data.main.temp,
+            humidity: response.data.main.humidity,
+            feels_like: response.data.main.feels_like,
+            wind: response.data.wind.speed,
+            description: response.data.weather[0].description,
+        });
+
+    }
+
+    //axios.get(apiUrl).then(handleResponse);
+    function handleSubmit(e) {
+        e.preventDefault();
+        if (value) {
+            setCity(value);
+        }
+    }
+    useEffect(() => {
+        if (city) {
+            let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+            axios.get(apiUrl).then(getCityInfo);
+        }
+    }, [city]);
+
+    function getValue(e) {
+        setValue(e.target.value);
+    }
+
     return (
         <div className="App">
             <div className="container">
                 <div className="weather-app">
                     <div className="row weather-app-header ">
-                        <form className="col-12 col-lg-12 search ">
+                        <form className="col-12 col-lg-12 search " onSubmit={handleSubmit}>
                             <div className="col-2 col-lg-3 current-position">
                                 <p>Current city</p>
                             </div>
@@ -21,7 +56,7 @@ export default function App() {
                                 type="text"
                                 className="col-8 col-lg-9 input-search"
                                 placeholder="Enter city..."
-
+                                onChange={getValue}
                             />
 
                             <div className="btn-search">
@@ -35,8 +70,7 @@ export default function App() {
                                     <img src={pin} alt="pin"/>
                                 </div>
                                 <div className="col-10 location">
-                                    <span className="city">Toronto</span>
-
+                                    <span className="city">{city}</span>
                                     <p className="today-date">Saturday, July 8, 17:41</p>
                                 </div>
                             </div>
@@ -47,8 +81,8 @@ export default function App() {
                             <img className="weather-pic" src={clouds} alt=""/>
                         </div>
                         <div className="col-3 weather-temp">
-                            <p className="show-temperature">10°</p>
-                            <p className="weather-temp-description">Cloudy</p>
+                            <p className="show-temperature">{Math.round(weatherData.temperature)}°</p>
+                            <p className="weather-temp-description text-capitalize">{weatherData.description}</p>
                         </div>
                         <div className="col-1 weather-convector">
                             <p className="celsius active-convert " data-degree="celsius">
@@ -68,7 +102,7 @@ export default function App() {
                                     <p>feels like</p>
                                 </div>
                                 <div className="col-4 weather-info-value ">
-                                    <p className="feels-like">19°</p>
+                                    <p className="feels-like">{Math.round(weatherData.feels_like)}°</p>
                                 </div>
                             </div>
                             <div className="col-12 weather-info-item">
@@ -79,7 +113,7 @@ export default function App() {
                                     <p>humidity</p>
                                 </div>
                                 <div className="col-4 weather-info-value">
-                                    <p className="humidity">45%</p>
+                                    <p className="humidity">{weatherData.humidity}%</p>
                                 </div>
                             </div>
                             <div className="col-12 weather-info-item">
@@ -90,7 +124,7 @@ export default function App() {
                                     <p>wind</p>
                                 </div>
                                 <div className="col-4 weather-info-value">
-                                    <p className="wind">12 km/h</p>
+                                    <p className="wind">{Math.round(weatherData.wind)}km/h</p>
                                 </div>
                             </div>
                         </div>
