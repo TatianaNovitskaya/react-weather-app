@@ -7,21 +7,42 @@ import pin from "./images/pin.png";
 import search from "./images/search.png";
 import './App.css';
 import axios from 'axios';
-import FormatDate from "./Date"
+import FormatDate from "./Date";
+import Icons from "./Icons"
 
 export default function App() {
     const [value, setValue] = useState(null);
-    const [city, setCity] = useState("Paris");
-    const [weatherData, setWeatherData] = useState({})
+    const [city, setCity] = useState("");
+    const [weatherData, setWeatherData] = useState({
+        temperature: 0,
+        humidity: 0,
+        feels_like: 0,
+        wind: 0,
+        description: "",
+        icon: ""
+    })
     const apiKey = "a9573fb89158f89d83ceea2936963385";
     function getCityInfo(response) {
+        setCity(response.data.name);
         setWeatherData({
             temperature: response.data.main.temp,
             humidity: response.data.main.humidity,
             feels_like: response.data.main.feels_like,
             wind: response.data.wind.speed,
             description: response.data.weather[0].description,
+            icon: response.data.weather[0].main
         });
+
+    }
+
+    function getCurrentLocation() {
+        navigator.geolocation.getCurrentPosition(getPosition);
+    }
+    function getPosition(position) {
+        let currentLatitude = position.coords.latitude;
+        let currentLongitude = position.coords.longitude;
+        let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${currentLatitude}&lon=${currentLongitude}&appid=${apiKey}&units=metric`;
+        axios.get(apiUrl).then(getCityInfo)
 
     }
 
@@ -30,6 +51,7 @@ export default function App() {
         if (value) {
             setCity(value);
         }
+
     }
     useEffect(() => {
         if (city) {
@@ -37,7 +59,9 @@ export default function App() {
             axios.get(apiUrl).then(getCityInfo);
         }
     }, [city]);
-
+    useEffect(() => {
+        getCurrentLocation()
+    }, []);
     function getValue(e) {
         setValue(e.target.value);
     }
@@ -48,7 +72,7 @@ export default function App() {
                 <div className="weather-app">
                     <div className="row weather-app-header ">
                         <form className="col-12 col-lg-12 search " onSubmit={handleSubmit}>
-                            <div className="col-2 col-lg-3 current-position">
+                            <div className="col-2 col-lg-3 current-position" onClick={getCurrentLocation}>
                                 <p>Current city</p>
                             </div>
                             <input
@@ -76,9 +100,7 @@ export default function App() {
                         </div>
                     </div>
                     <div className="row weather-app-main ">
-                        <div className="col-3 weather-icon">
-                            <img className="weather-pic" src={clouds} alt=""/>
-                        </div>
+                        <Icons icon={weatherData.icon}/>
                         <div className="col-3 weather-temp">
                             <p className="show-temperature">{Math.round(weatherData.temperature)}°</p>
                             <p className="weather-temp-description text-capitalize">{weatherData.description}</p>

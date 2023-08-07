@@ -237,7 +237,7 @@ main {
 }
 
 .weather-temp-description {
-    bottom: 0;
+    bottom: -15px;
     color: #c06c84;
     font-size: 18px;
     font-weight: 700;
