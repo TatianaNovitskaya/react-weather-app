@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import clouds from "./images/clouds.png";
+
 import heat from "./images/heat.png";
 import drop from "./images/drop.png";
 import wind from "./images/wind.png";
@@ -13,6 +13,8 @@ import Icons from "./Icons"
 export default function App() {
     const [value, setValue] = useState(null);
     const [city, setCity] = useState("");
+    const [unit, setUnit] = useState("celsius");
+    const [celsiusTemperature, setCelsiusTemperature] = useState(null)
     const [weatherData, setWeatherData] = useState({
         temperature: 0,
         humidity: 0,
@@ -24,8 +26,9 @@ export default function App() {
     const apiKey = "a9573fb89158f89d83ceea2936963385";
     function getCityInfo(response) {
         setCity(response.data.name);
+        setCelsiusTemperature(toggleTemperature(response.data.main.temp));
         setWeatherData({
-            temperature: response.data.main.temp,
+
             humidity: response.data.main.humidity,
             feels_like: response.data.main.feels_like,
             wind: response.data.wind.speed,
@@ -42,7 +45,7 @@ export default function App() {
         let currentLatitude = position.coords.latitude;
         let currentLongitude = position.coords.longitude;
         let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${currentLatitude}&lon=${currentLongitude}&appid=${apiKey}&units=metric`;
-        axios.get(apiUrl).then(getCityInfo)
+        getAxiosUrl(apiUrl)
 
     }
 
@@ -56,15 +59,78 @@ export default function App() {
     useEffect(() => {
         if (city) {
             let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-            axios.get(apiUrl).then(getCityInfo);
+            getAxiosUrl(apiUrl)
         }
     }, [city]);
     useEffect(() => {
-        getCurrentLocation()
+        getCurrentLocation();
+        localStorage.setItem("temperature","celsius");
     }, []);
     function getValue(e) {
         setValue(e.target.value);
     }
+
+
+    const currentTempInCelsius = document.querySelector(".show-temperature");
+
+    function getStorageTemperarure() {
+        return localStorage.getItem("temperature");
+    }
+    function getCurrentTemperature(response) {
+        setCelsiusTemperature(toggleTemperature(response.data.main.temp));
+    }
+    function displayFahrengeit() {
+        if (getStorageTemperarure() === "fahrenheit") {
+            return;
+        }
+
+        let fahrengeitTemperature = conversionFahrenheit(celsiusTemperature)
+        setCelsiusTemperature(fahrengeitTemperature)
+        localStorage.setItem("temperature","fahrenheit");
+        setUnit('fahrenheit')
+    }
+
+    function displayCelsius() {
+        if (getStorageTemperarure() === "celsius") {
+            return;
+        }
+        setUnit('celsius')
+        let convertFahrenheitToCelsius =  Math.round((celsiusTemperature - 32) * 5/9);
+        setCelsiusTemperature(convertFahrenheitToCelsius)
+        localStorage.setItem("temperature","celsius");
+    }
+
+    function conversionFahrenheit(num) {
+        return Math.round((num * 9 / 5) + 32);
+    }
+
+    function conversionCelsius(num) {
+        return Math.round(num)
+    }
+
+    function toggleTemperature(number) {
+
+        if(getStorageTemperarure() === "fahrenheit"){
+            return conversionFahrenheit(number)
+        } else {
+            return conversionCelsius(number)
+        }
+
+    }
+
+    function getAxiosUrl(apiUrl) {
+        axios.get(apiUrl).then((response) => {
+            getCurrentTemperature(response);
+            getCityInfo(response);
+
+            if(getStorageTemperarure() === "fahrenheit"){
+                displayFahrengeit();
+            }
+        })
+
+    }
+
+    console.log(unit);
 
     return (
         <div className="App">
@@ -102,15 +168,15 @@ export default function App() {
                     <div className="row weather-app-main ">
                         <Icons icon={weatherData.icon}/>
                         <div className="col-3 weather-temp">
-                            <p className="show-temperature">{Math.round(weatherData.temperature)}°</p>
+                            <p className="show-temperature">{Math.round(celsiusTemperature)}°</p>
                             <p className="weather-temp-description text-capitalize">{weatherData.description}</p>
                         </div>
                         <div className="col-1 weather-convector">
-                            <p className="celsius active-convert " data-degree="celsius">
+                            <p className={`${unit}`  === 'celsius' ? 'celsius active-convert' : 'celsius'} data-degree="celsius" onClick={displayCelsius}>
                                 C
                             </p>
                             <div className="delimiter"></div>
-                            <p className="fahrenheit " data-degree="fahrenheit">
+                            <p className={`${unit}` === 'fahrenheit' ? 'fahrenheit active-convert' : 'fahrenheit'} data-degree="fahrenheit" onClick={displayFahrengeit}>
                                 F
                             </p>
                         </div>
