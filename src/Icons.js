@@ -44,7 +44,8 @@ export default function Icons({icon}) {
         case "mist-day":
             iconUrl = mist;
             break;
-
+        default:
+            break;
     }
     return (
         <div className="col-3 weather-icon">

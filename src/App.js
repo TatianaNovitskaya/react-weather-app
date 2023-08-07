@@ -59,19 +59,20 @@ export default function App() {
     useEffect(() => {
         if (city) {
             let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+            // eslint-disable-next-line
             getAxiosUrl(apiUrl)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [city]);
     useEffect(() => {
+        // eslint-disable-next-line
         getCurrentLocation();
         localStorage.setItem("temperature","celsius");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     function getValue(e) {
         setValue(e.target.value);
     }
-
-
-    const currentTempInCelsius = document.querySelector(".show-temperature");
 
     function getStorageTemperarure() {
         return localStorage.getItem("temperature");
