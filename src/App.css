@@ -313,6 +313,52 @@ main {
     font-size: 20px;
     font-weight: 700;
 }
+.forecast-item {
+    background: #c06c84;
+    border-radius: 25px;
+    -webkit-box-shadow: 2px 2px 10px #999;
+    box-shadow: 2px 2px 10px #999;
+    margin: 10px;
+    padding: 5px 0;
+    width: 63px;
+}
+
+.forecast-item-day {
+    text-align: center;
+}
+
+.forecast-item-day p {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.forecast-item-icon {
+    margin: 5px auto 0;
+    width: 35px;
+    height: 35px
+}
+
+.forecast-item-temp-max {
+    margin-top: 5px;
+    text-align: center;
+}
+
+.forecast-item-temp-max p {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.forecast-item-temp-min {
+    text-align: center;
+}
+
+.forecast-item-temp-low p {
+    color: #fff;
+    font-size: 14px;
+}
+
 .footer{
     position: absolute;
     bottom: 5px;

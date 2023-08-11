@@ -10,6 +10,7 @@ import axios from 'axios';
 import FormatDate from "./Date";
 import Icons from "./Icons"
 
+
 export default function App() {
     const [value, setValue] = useState(null);
     const [city, setCity] = useState("");
@@ -24,11 +25,12 @@ export default function App() {
         icon: ""
     })
     const apiKey = "a9573fb89158f89d83ceea2936963385";
+    const [days, setDays] = useState([]);
     function getCityInfo(response) {
+        console.log(response.data)
         setCity(response.data.name);
         setCelsiusTemperature(toggleTemperature(response.data.main.temp));
         setWeatherData({
-
             humidity: response.data.main.humidity,
             feels_like: response.data.main.feels_like,
             wind: response.data.wind.speed,
@@ -37,7 +39,6 @@ export default function App() {
         });
 
     }
-
     function getCurrentLocation() {
         navigator.geolocation.getCurrentPosition(getPosition);
     }
@@ -48,7 +49,6 @@ export default function App() {
         getAxiosUrl(apiUrl)
 
     }
-
     function handleSubmit(e) {
         e.preventDefault();
         if (value) {
@@ -73,7 +73,6 @@ export default function App() {
     function getValue(e) {
         setValue(e.target.value);
     }
-
     function getStorageTemperarure() {
         return localStorage.getItem("temperature");
     }
@@ -90,7 +89,6 @@ export default function App() {
         localStorage.setItem("temperature","fahrenheit");
         setUnit('fahrenheit')
     }
-
     function displayCelsius() {
         if (getStorageTemperarure() === "celsius") {
             return;
@@ -100,15 +98,12 @@ export default function App() {
         setCelsiusTemperature(convertFahrenheitToCelsius)
         localStorage.setItem("temperature","celsius");
     }
-
     function conversionFahrenheit(num) {
         return Math.round((num * 9 / 5) + 32);
     }
-
     function conversionCelsius(num) {
         return Math.round(num)
     }
-
     function toggleTemperature(number) {
 
         if(getStorageTemperarure() === "fahrenheit"){
@@ -118,20 +113,31 @@ export default function App() {
         }
 
     }
-
     function getAxiosUrl(apiUrl) {
         axios.get(apiUrl).then((response) => {
             getCurrentTemperature(response);
             getCityInfo(response);
+            displayForecast(response.data.coord);
 
             if(getStorageTemperarure() === "fahrenheit"){
                 displayFahrengeit();
             }
         })
+    }
+    function displayForecast(coordinates) {
+        let apiKey = "0df6a9dd1987o3afdebba40233td58aa";
+        let apiUrl = `https://api.shecodes.io/weather/v1/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&key=${apiKey}&units=metric`;
 
+        axios.get(apiUrl).then((response)=>{
+            setDays(response.data.daily);
+        });
+    }
+    function convertDays(miliseconds) {
+        let date = new Date(miliseconds * 1000);
+        let day = new Intl.DateTimeFormat("en-US", {weekday: "short"}).format(date);
+        return day
     }
 
-    console.log(unit);
 
     return (
         <div className="App">
@@ -167,7 +173,9 @@ export default function App() {
                         </div>
                     </div>
                     <div className="row weather-app-main ">
+                        <div className="col-3 weather-icon">
                         <Icons icon={weatherData.icon}/>
+                        </div>
                         <div className="col-3 weather-temp">
                             <p className="show-temperature">{Math.round(celsiusTemperature)}°</p>
                             <p className="weather-temp-description text-capitalize">{weatherData.description}</p>
@@ -217,6 +225,32 @@ export default function App() {
                             </div>
                         </div>
                     </div>
+                    <div className="row weather-app-forecast">
+                        <div className="col-12 forecast-title">
+                            <h3>7 Day Forecast</h3>
+                        </div>
+                        <div className="row justify-content-center forecast">
+                            {days.length > 0 && days.map((forecastDay, index) => (
+
+                                <div className="col-1 forecast-item " key={index}>
+                                    <div className="forecast-item-day">
+                                        <p>{convertDays(forecastDay.time)}</p>
+                                    </div>
+                                    <div className="forecast-item-icon">
+                                        <Icons icon={forecastDay.condition.icon}/>
+                                    </div>
+                                    <div className="forecast-item-temp-max">
+                                        <p>{toggleTemperature(forecastDay.temperature.maximum)} °</p>
+                                    </div>
+                                    <div className="forecast-item-temp-min">
+                                        <p>{toggleTemperature(forecastDay.temperature.minimum)} °</p>
+                                    </div>
+                                </div>
+
+                            ))}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

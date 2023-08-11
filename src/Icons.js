@@ -48,8 +48,8 @@ export default function Icons({icon}) {
             break;
     }
     return (
-        <div className="col-3 weather-icon">
+        <>
             <img className="weather-pic" src={iconUrl} alt=""/>
-        </div>
+        </>
     )
 }
